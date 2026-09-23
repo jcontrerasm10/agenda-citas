@@ -91,4 +91,23 @@ public class CitaDAO {
 
         return Optional.empty();
     }
+    
+    public boolean actualizar(Cita cita) throws SQLException {
+        String sql = "UPDATE citas SET cliente = ?, fecha_hora = ?, servicio = ?, "
+                + "duracion_minutos = ?, estado = ? WHERE id = ?";
+
+        try (Connection conn = ConexionBD.obtenerConexion();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, cita.getCliente());
+            ps.setTimestamp(2, Timestamp.valueOf(cita.getFechaHora()));
+            ps.setString(3, cita.getServicio());
+            ps.setInt(4, cita.getDuracionMinutos());
+            ps.setString(5, cita.getEstado().getValorBD());
+            ps.setInt(6, cita.getId());
+
+            int filasAfectadas = ps.executeUpdate();
+            return filasAfectadas > 0;
+        }
+    }
 }
