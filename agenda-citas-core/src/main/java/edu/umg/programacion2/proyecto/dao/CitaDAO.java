@@ -110,4 +110,16 @@ public class CitaDAO {
             return filasAfectadas > 0;
         }
     }
+    
+    public boolean eliminar(int id) throws SQLException {
+        String sql = "DELETE FROM citas WHERE id = ?";
+
+        try (Connection conn = ConexionBD.obtenerConexion();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            int filasAfectadas = ps.executeUpdate();
+            return filasAfectadas > 0;
+        }
+    }
 }
