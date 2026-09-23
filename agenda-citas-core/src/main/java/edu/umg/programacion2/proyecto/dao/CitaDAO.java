@@ -6,6 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.umg.programacion2.proyecto.modelo.EstadoCita;
 
 import edu.umg.programacion2.proyecto.modelo.Cita;
 
@@ -33,6 +37,38 @@ public class CitaDAO {
             }
         }
 
+        return cita;
+    }
+    
+    public List<Cita> listarTodos() throws SQLException {
+        List<Cita> citas = new ArrayList<>();
+        String sql = "SELECT id, cliente, fecha_hora, servicio, duracion_minutos, estado "
+                + "FROM citas ORDER BY fecha_hora";
+
+        try (Connection conn = ConexionBD.obtenerConexion();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                citas.add(mapearCita(rs));
+            }
+        }
+
+        return citas;
+    }
+
+    /**
+     * Convierte una fila del ResultSet en un objeto Cita.
+     * Se reutiliza en listarTodos() y en buscarPorId().
+     */
+    private Cita mapearCita(ResultSet rs) throws SQLException {
+        Cita cita = new Cita();
+        cita.setId(rs.getInt("id"));
+        cita.setCliente(rs.getString("cliente"));
+        cita.setFechaHora(rs.getTimestamp("fecha_hora").toLocalDateTime());
+        cita.setServicio(rs.getString("servicio"));
+        cita.setDuracionMinutos(rs.getInt("duracion_minutos"));
+        cita.setEstado(EstadoCita.desdeValorBD(rs.getString("estado")));
         return cita;
     }
 }
