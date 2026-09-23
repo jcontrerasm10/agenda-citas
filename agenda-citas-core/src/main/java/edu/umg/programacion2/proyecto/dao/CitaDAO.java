@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import edu.umg.programacion2.proyecto.modelo.EstadoCita;
 
@@ -70,5 +71,24 @@ public class CitaDAO {
         cita.setDuracionMinutos(rs.getInt("duracion_minutos"));
         cita.setEstado(EstadoCita.desdeValorBD(rs.getString("estado")));
         return cita;
+    }
+    
+    public Optional<Cita> buscarPorId(int id) throws SQLException {
+        String sql = "SELECT id, cliente, fecha_hora, servicio, duracion_minutos, estado "
+                + "FROM citas WHERE id = ?";
+
+        try (Connection conn = ConexionBD.obtenerConexion();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapearCita(rs));
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 }
