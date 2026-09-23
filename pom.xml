@@ -6,5 +6,6 @@
   <packaging>pom</packaging>
   <modules>
   	<module>agenda-citas-core</module>
+  	<module>agenda-citas-ui</module>
   </modules>
 </project>
