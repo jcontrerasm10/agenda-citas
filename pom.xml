@@ -8,4 +8,11 @@
   	<module>agenda-citas-core</module>
   	<module>agenda-citas-ui</module>
   </modules>
+  <dependencies>
+    <dependency>
+        <groupId>edu.umg.programacion2.proyecto</groupId>
+        <artifactId>agenda-citas-core</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+</dependencies>
 </project>
