@@ -99,9 +99,13 @@ public class VentanaPrincipal extends JFrame {
         JButton btnActualizar = new JButton("Actualizar cita seleccionada");
         btnActualizar.addActionListener(e -> actualizarCita());
 
+        JButton btnEliminar = new JButton("Eliminar cita seleccionada");
+        btnEliminar.addActionListener(e -> eliminarCita());
+
         JPanel panelBotones = new JPanel();
         panelBotones.add(btnAgregar);
         panelBotones.add(btnActualizar);
+        panelBotones.add(btnEliminar);
 
         JPanel panelFormulario = new JPanel(new BorderLayout());
         panelFormulario.add(panelCampos, BorderLayout.CENTER);
@@ -224,6 +228,44 @@ public class VentanaPrincipal extends JFrame {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
                     "No se pudo actualizar la cita.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void eliminarCita() {
+        if (idSeleccionado == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Selecciona una cita de la tabla para eliminar.",
+                    "Ninguna cita seleccionada",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int confirmacion = JOptionPane.showConfirmDialog(this,
+                "¿Seguro que deseas eliminar esta cita? Esta accion no se puede deshacer.",
+                "Confirmar eliminacion",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+
+        if (confirmacion != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+            boolean eliminado = citaDAO.eliminar(idSeleccionado);
+            if (eliminado) {
+                cargarDatos();
+                limpiarFormulario();
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "No se encontro la cita a eliminar.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo eliminar la cita.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
