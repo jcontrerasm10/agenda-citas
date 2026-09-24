@@ -9,6 +9,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -35,6 +36,9 @@ public class VentanaPrincipal extends JFrame {
     private JTextField txtFechaHora;
     private JTextField txtServicio;
     private JTextField txtDuracion;
+    private JComboBox<EstadoCita> comboEstado;
+
+    private int idSeleccionado = -1; // -1 = no hay ninguna cita seleccionada (modo crear)
 
     public VentanaPrincipal() {
         setTitle("Agenda de Citas");
@@ -59,17 +63,24 @@ public class VentanaPrincipal extends JFrame {
 
         tablaCitas = new JTable(modeloTabla);
 
+        tablaCitas.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                cargarSeleccionEnFormulario();
+            }
+        });
+
         JScrollPane scrollPane = new JScrollPane(tablaCitas);
         add(scrollPane, BorderLayout.CENTER);
     }
 
     private void inicializarFormulario() {
-        JPanel panelCampos = new JPanel(new GridLayout(4, 2, 5, 5));
+        JPanel panelCampos = new JPanel(new GridLayout(5, 2, 5, 5));
 
         txtCliente = new JTextField();
         txtFechaHora = new JTextField();
         txtServicio = new JTextField();
         txtDuracion = new JTextField();
+        comboEstado = new JComboBox<>(EstadoCita.values());
 
         panelCampos.add(new JLabel("Cliente:"));
         panelCampos.add(txtCliente);
@@ -79,12 +90,18 @@ public class VentanaPrincipal extends JFrame {
         panelCampos.add(txtServicio);
         panelCampos.add(new JLabel("Duracion (min):"));
         panelCampos.add(txtDuracion);
+        panelCampos.add(new JLabel("Estado:"));
+        panelCampos.add(comboEstado);
 
         JButton btnAgregar = new JButton("Agregar cita");
         btnAgregar.addActionListener(e -> agregarCita());
 
+        JButton btnActualizar = new JButton("Actualizar cita seleccionada");
+        btnActualizar.addActionListener(e -> actualizarCita());
+
         JPanel panelBotones = new JPanel();
         panelBotones.add(btnAgregar);
+        panelBotones.add(btnActualizar);
 
         JPanel panelFormulario = new JPanel(new BorderLayout());
         panelFormulario.add(panelCampos, BorderLayout.CENTER);
@@ -93,7 +110,13 @@ public class VentanaPrincipal extends JFrame {
         add(panelFormulario, BorderLayout.SOUTH);
     }
 
-    private void agregarCita() {
+    /**
+     * Lee y valida los campos comunes del formulario (cliente, servicio,
+     * fecha/hora, duracion). No valida "fecha pasada" aqui porque esa regla
+     * solo aplica al crear, no al reprogramar una cita existente.
+     * Devuelve null si algo es invalido (y ya mostro el JOptionPane correspondiente).
+     */
+    private Cita leerFormulario() {
         String cliente = txtCliente.getText().trim();
         String servicio = txtServicio.getText().trim();
         String textoFecha = txtFechaHora.getText().trim();
@@ -104,7 +127,7 @@ public class VentanaPrincipal extends JFrame {
                     "El cliente y el servicio no pueden quedar vacios.",
                     "Datos incompletos",
                     JOptionPane.WARNING_MESSAGE);
-            return;
+            return null;
         }
 
         LocalDateTime fechaHora;
@@ -115,15 +138,7 @@ public class VentanaPrincipal extends JFrame {
                     "La fecha y hora deben tener el formato yyyy-MM-dd HH:mm (ej. 2026-09-20 14:30).",
                     "Formato invalido",
                     JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        if (fechaHora.isBefore(LocalDateTime.now())) {
-            JOptionPane.showMessageDialog(this,
-                    "La fecha y hora de la cita no puede ser una fecha que ya paso.",
-                    "Fecha invalida",
-                    JOptionPane.WARNING_MESSAGE);
-            return;
+            return null;
         }
 
         int duracion;
@@ -134,7 +149,7 @@ public class VentanaPrincipal extends JFrame {
                     "La duracion debe ser un numero entero.",
                     "Dato invalido",
                     JOptionPane.WARNING_MESSAGE);
-            return;
+            return null;
         }
 
         if (duracion <= 0) {
@@ -142,10 +157,30 @@ public class VentanaPrincipal extends JFrame {
                     "La duracion estimada debe ser mayor a cero minutos.",
                     "Dato invalido",
                     JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+
+        EstadoCita estado = (EstadoCita) comboEstado.getSelectedItem();
+
+        return new Cita(cliente, fechaHora, servicio, duracion, estado);
+    }
+
+    private void agregarCita() {
+        Cita datos = leerFormulario();
+        if (datos == null) {
             return;
         }
 
-        Cita nuevaCita = new Cita(cliente, fechaHora, servicio, duracion, EstadoCita.PENDIENTE);
+        if (datos.getFechaHora().isBefore(LocalDateTime.now())) {
+            JOptionPane.showMessageDialog(this,
+                    "La fecha y hora de la cita no puede ser una fecha que ya paso.",
+                    "Fecha invalida",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Cita nuevaCita = new Cita(datos.getCliente(), datos.getFechaHora(), datos.getServicio(),
+                datos.getDuracionMinutos(), EstadoCita.PENDIENTE);
 
         try {
             citaDAO.crear(nuevaCita);
@@ -159,11 +194,71 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
+    private void actualizarCita() {
+        if (idSeleccionado == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Selecciona una cita de la tabla para actualizar.",
+                    "Ninguna cita seleccionada",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Cita datos = leerFormulario();
+        if (datos == null) {
+            return;
+        }
+
+        datos.setId(idSeleccionado);
+
+        try {
+            boolean actualizado = citaDAO.actualizar(datos);
+            if (actualizado) {
+                cargarDatos();
+                limpiarFormulario();
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "No se encontro la cita a actualizar.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo actualizar la cita.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void cargarSeleccionEnFormulario() {
+        int fila = tablaCitas.getSelectedRow();
+        if (fila == -1) {
+            return;
+        }
+
+        idSeleccionado = (int) modeloTabla.getValueAt(fila, 0);
+        txtCliente.setText((String) modeloTabla.getValueAt(fila, 1));
+        txtFechaHora.setText((String) modeloTabla.getValueAt(fila, 2));
+        txtServicio.setText((String) modeloTabla.getValueAt(fila, 3));
+        txtDuracion.setText(String.valueOf(modeloTabla.getValueAt(fila, 4)));
+
+        String estadoTexto = (String) modeloTabla.getValueAt(fila, 5);
+        for (int i = 0; i < comboEstado.getItemCount(); i++) {
+            EstadoCita estado = comboEstado.getItemAt(i);
+            if (estado.toString().equalsIgnoreCase(estadoTexto)) {
+                comboEstado.setSelectedItem(estado);
+                break;
+            }
+        }
+    }
+
     private void limpiarFormulario() {
         txtCliente.setText("");
         txtFechaHora.setText("");
         txtServicio.setText("");
         txtDuracion.setText("");
+        comboEstado.setSelectedItem(EstadoCita.PENDIENTE);
+        idSeleccionado = -1;
+        tablaCitas.clearSelection();
     }
 
     private void cargarDatos() {
