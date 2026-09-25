@@ -35,6 +35,8 @@ public class Cita {
         this.servicio = servicio;
         this.duracionMinutos = duracionMinutos;
         this.estado = estado;
+        this.requiereConfirmacionLlamada = requiereConfirmacionLlamada;
+        this.esPrimeraVisita = esPrimeraVisita;
     }
     public int getId() {
         return id;
