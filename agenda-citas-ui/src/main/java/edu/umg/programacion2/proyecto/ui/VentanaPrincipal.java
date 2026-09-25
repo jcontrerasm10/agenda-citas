@@ -302,6 +302,8 @@ public class VentanaPrincipal extends JFrame {
                 break;
             }
         }
+        chkRequiereConfirmacionLlamada.setSelected((boolean) modeloTabla.getValueAt(fila, 6));
+        chkEsPrimeraVisita.setSelected((boolean) modeloTabla.getValueAt(fila, 7));
     }
 
     private void limpiarFormulario() {
@@ -310,6 +312,8 @@ public class VentanaPrincipal extends JFrame {
         txtServicio.setText("");
         txtDuracion.setText("");
         comboEstado.setSelectedItem(EstadoCita.PENDIENTE);
+        chkRequiereConfirmacionLlamada.setSelected(false);
+        chkEsPrimeraVisita.setSelected(false);
         idSeleccionado = -1;
         tablaCitas.clearSelection();
     }
