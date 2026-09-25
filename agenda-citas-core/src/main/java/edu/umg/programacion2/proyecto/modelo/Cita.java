@@ -24,6 +24,8 @@ public class Cita {
         this.servicio = servicio;
         this.duracionMinutos = duracionMinutos;
         this.estado = estado;
+        this.requiereConfirmacionLlamada = requiereConfirmacionLlamada;
+        this.esPrimeraVisita = esPrimeraVisita;
     }
 
     // Constructor completo: para reconstruir una cita leida desde la BD
