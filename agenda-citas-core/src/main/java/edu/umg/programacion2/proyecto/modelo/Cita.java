@@ -88,6 +88,16 @@ public class Cita {
         this.estado = estado;
     }
 
+    public boolean isRequiereConfirmacionLlamada() { return requiereConfirmacionLlamada; }
+    public void setRequiereConfirmacionLlamada(boolean requiereConfirmacionLlamada) {
+        this.requiereConfirmacionLlamada = requiereConfirmacionLlamada;
+    }
+
+    public boolean isEsPrimeraVisita() { return esPrimeraVisita; }
+    public void setEsPrimeraVisita(boolean esPrimeraVisita) {
+        this.esPrimeraVisita = esPrimeraVisita;
+    }
+    
     @Override
     public String toString() {
         return "Cita{id=" + id + ", cliente='" + cliente + "', fechaHora=" + fechaHora
