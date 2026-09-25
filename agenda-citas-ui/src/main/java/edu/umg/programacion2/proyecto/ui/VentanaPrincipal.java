@@ -9,6 +9,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -37,6 +38,8 @@ public class VentanaPrincipal extends JFrame {
     private JTextField txtServicio;
     private JTextField txtDuracion;
     private JComboBox<EstadoCita> comboEstado;
+    private JCheckBox chkRequiereConfirmacionLlamada;
+    private JCheckBox chkEsPrimeraVisita;
 
     private int idSeleccionado = -1; // -1 = no hay ninguna cita seleccionada (modo crear)
 
@@ -74,13 +77,15 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private void inicializarFormulario() {
-        JPanel panelCampos = new JPanel(new GridLayout(5, 2, 5, 5));
+    	JPanel panelCampos = new JPanel(new GridLayout(7, 2, 5, 5));
 
         txtCliente = new JTextField();
         txtFechaHora = new JTextField();
         txtServicio = new JTextField();
         txtDuracion = new JTextField();
         comboEstado = new JComboBox<>(EstadoCita.values());
+        chkRequiereConfirmacionLlamada = new JCheckBox();
+        chkEsPrimeraVisita = new JCheckBox();
 
         panelCampos.add(new JLabel("Cliente:"));
         panelCampos.add(txtCliente);
@@ -92,6 +97,10 @@ public class VentanaPrincipal extends JFrame {
         panelCampos.add(txtDuracion);
         panelCampos.add(new JLabel("Estado:"));
         panelCampos.add(comboEstado);
+        panelCampos.add(new JLabel("Requiere confirmación por llamada:"));
+        panelCampos.add(chkRequiereConfirmacionLlamada);
+        panelCampos.add(new JLabel("Es primera visita;"));
+        panelCampos.add(chkEsPrimeraVisita);
 
         JButton btnAgregar = new JButton("Agregar cita");
         btnAgregar.addActionListener(e -> agregarCita());
