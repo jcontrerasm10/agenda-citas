@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS citas (
     servicio          VARCHAR(150)  NOT NULL,
     duracion_minutos  INT           NOT NULL,
     estado            VARCHAR(20)   NOT NULL DEFAULT 'pendiente'
+    requiere_confirmacion_llamada  BOOLEAN NOT NULL DEFAULT FALSE,
+    es_primera_visita              BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- Datos de ejemplo (opcional, para probar el listado)
