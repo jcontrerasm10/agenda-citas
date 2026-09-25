@@ -55,8 +55,9 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private void inicializarTabla() {
-        String[] columnas = {"ID", "Cliente", "Fecha y hora", "Servicio", "Duracion (min)", "Estado"};
-
+    	String[] columnas = {"ID", "Cliente", "Fecha y hora", "Servicio",
+    	        "Duracion (min)", "Estado", "Llamada", "1ra visita"};
+    	
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -330,7 +331,9 @@ public class VentanaPrincipal extends JFrame {
                         cita.getFechaHora().format(FORMATO_FECHA),
                         cita.getServicio(),
                         cita.getDuracionMinutos(),
-                        cita.getEstado().toString()
+                        cita.getEstado().toString(),
+                        cita.isRequiereConfirmacionLlamada(),
+                        cita.isEsPrimeraVisita()
                 };
                 modeloTabla.addRow(fila);
             }
