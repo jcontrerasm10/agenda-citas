@@ -10,6 +10,8 @@ public class Cita {
     private String servicio;
     private int duracionMinutos;
     private EstadoCita estado;
+    private boolean requiereConfirmacionLlamada;
+    private boolean esPrimeraVisita;
 
     public Cita() {
     }
