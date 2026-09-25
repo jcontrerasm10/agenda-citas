@@ -18,7 +18,8 @@ public class Cita {
 
     // Constructor sin id: para crear una cita nueva (el id lo asigna la BD)
     public Cita(String cliente, LocalDateTime fechaHora, String servicio,
-                int duracionMinutos, EstadoCita estado) {
+            int duracionMinutos, EstadoCita estado,
+            boolean requiereConfirmacionLlamada, boolean esPrimeraVisita) {
         this.cliente = cliente;
         this.fechaHora = fechaHora;
         this.servicio = servicio;
@@ -30,7 +31,8 @@ public class Cita {
 
     // Constructor completo: para reconstruir una cita leida desde la BD
     public Cita(int id, String cliente, LocalDateTime fechaHora, String servicio,
-                int duracionMinutos, EstadoCita estado) {
+            int duracionMinutos, EstadoCita estado,
+            boolean requiereConfirmacionLlamada, boolean esPrimeraVisita) {
         this.id = id;
         this.cliente = cliente;
         this.fechaHora = fechaHora;

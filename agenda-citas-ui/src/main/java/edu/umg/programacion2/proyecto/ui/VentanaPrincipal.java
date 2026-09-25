@@ -174,8 +174,10 @@ public class VentanaPrincipal extends JFrame {
         }
 
         EstadoCita estado = (EstadoCita) comboEstado.getSelectedItem();
-
-        return new Cita(cliente, fechaHora, servicio, duracion, estado);
+        boolean requiereConfirmacionLlamada = chkRequiereConfirmacionLlamada.isSelected();
+        boolean esPrimeraVisita = chkEsPrimeraVisita.isSelected();
+        return new Cita(cliente, fechaHora, servicio, duracion, estado,
+                requiereConfirmacionLlamada, esPrimeraVisita);
     }
 
     private void agregarCita() {
@@ -192,9 +194,9 @@ public class VentanaPrincipal extends JFrame {
             return;
         }
 
-        Cita nuevaCita = new Cita(datos.getCliente(), datos.getFechaHora(), datos.getServicio(),
-                datos.getDuracionMinutos(), EstadoCita.PENDIENTE);
-
+        Cita nuevaCita = new Cita(datos.getCliente(), datos.getFechaHora(),
+                datos.getServicio(), datos.getDuracionMinutos(), EstadoCita.PENDIENTE,
+                datos.isRequiereConfirmacionLlamada(), datos.isEsPrimeraVisita());
         try {
             citaDAO.crear(nuevaCita);
             cargarDatos();
