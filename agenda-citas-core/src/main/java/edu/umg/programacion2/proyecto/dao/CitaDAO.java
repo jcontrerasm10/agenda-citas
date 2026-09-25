@@ -73,6 +73,8 @@ public class CitaDAO {
         cita.setServicio(rs.getString("servicio"));
         cita.setDuracionMinutos(rs.getInt("duracion_minutos"));
         cita.setEstado(EstadoCita.desdeValorBD(rs.getString("estado")));
+        cita.setRequiereConfirmacionLlamada(rs.getBoolean("requiere_confirmacion_llamada"));
+        cita.setEsPrimeraVisita(rs.getBoolean("es_primera_visita"));
         return cita;
     }
     
