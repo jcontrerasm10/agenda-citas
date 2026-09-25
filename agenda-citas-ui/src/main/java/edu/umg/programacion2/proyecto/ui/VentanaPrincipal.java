@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -112,10 +114,14 @@ public class VentanaPrincipal extends JFrame {
         JButton btnEliminar = new JButton("Eliminar cita seleccionada");
         btnEliminar.addActionListener(e -> eliminarCita());
 
+        JButton btnConteoPorCliente = new JButton("Ver conteo por cliente");
+        btnConteoPorCliente.addActionListener(e -> verConteoPorCliente());
+
         JPanel panelBotones = new JPanel();
         panelBotones.add(btnAgregar);
         panelBotones.add(btnActualizar);
         panelBotones.add(btnEliminar);
+        panelBotones.add(btnConteoPorCliente);
 
         JPanel panelFormulario = new JPanel(new BorderLayout());
         panelFormulario.add(panelCampos, BorderLayout.CENTER);
@@ -283,6 +289,31 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
+    private void verConteoPorCliente() {
+        try {
+            List<Cita> citas = citaDAO.listarTodos();
+            Map<String, Integer> conteoPorCliente = new HashMap<>();
+
+            for (Cita cita : citas) {
+                String cliente = cita.getCliente();
+                int conteoActual = conteoPorCliente.getOrDefault(cliente, 0);
+                conteoPorCliente.put(cliente, conteoActual + 1);
+            }
+
+            StringBuilder mensaje = new StringBuilder("Cantidad de citas por cliente:\n\n");
+            for (Map.Entry<String, Integer> entrada : conteoPorCliente.entrySet()) {
+                mensaje.append(entrada.getKey()).append(": ").append(entrada.getValue()).append("\n");
+            }
+
+            JOptionPane.showMessageDialog(this, mensaje.toString(),
+                    "Conteo por cliente", JOptionPane.INFORMATION_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo calcular el conteo por cliente.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     private void cargarSeleccionEnFormulario() {
         int fila = tablaCitas.getSelectedRow();
         if (fila == -1) {

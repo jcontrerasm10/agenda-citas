@@ -46,9 +46,9 @@ public class CitaDAO {
     
     public List<Cita> listarTodos() throws SQLException {
         List<Cita> citas = new ArrayList<>();
-        String sql = "SELECT id, cliente, fecha_hora, servicio, duracion_minutos, estado "
+        String sql = "SELECT id, cliente, fecha_hora, servicio, duracion_minutos, "
+                + "estado, requiere_confirmacion_llamada, es_primera_visita "
                 + "FROM citas ORDER BY fecha_hora";
-
         try (Connection conn = ConexionBD.obtenerConexion();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -79,8 +79,9 @@ public class CitaDAO {
     }
     
     public Optional<Cita> buscarPorId(int id) throws SQLException {
-        String sql = "SELECT id, cliente, fecha_hora, servicio, duracion_minutos, estado "
-                + "FROM citas WHERE id = ?";
+    	String sql = "SELECT id, cliente, fecha_hora, servicio, duracion_minutos, "
+    	        + "estado, requiere_confirmacion_llamada, es_primera_visita "
+    	        + "FROM citas WHERE id = ?";
 
         try (Connection conn = ConexionBD.obtenerConexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
